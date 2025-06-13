@@ -1,223 +1,240 @@
 import React, { useState } from 'react';
-import { Outlet, useNavigate } from 'react-router-dom';
+import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { Button } from '../ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuSeparator, 
-  DropdownMenuTrigger 
-} from '../ui/dropdown-menu';
-import { 
-  Home, 
-  Settings, 
-  User, 
-  LogOut, 
-  Menu,
-  X,
-  MessageCircle,
-  DollarSign,
-  Calendar,
-  BarChart3,
-  Plus,
-  Megaphone,
-  MapPin,
-  Car,
-  Camera
-} from 'lucide-react';
 
 const DashboardLayout = () => {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
   const { user, logout } = useAuth();
+  const location = useLocation();
   const navigate = useNavigate();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const handleLogout = () => {
     logout();
     navigate('/login');
   };
 
-  const getNavigationItems = () => {
-    const baseItems = [
-      { icon: Home, label: 'Overview', path: '/dashboard' },
-      { icon: BarChart3, label: 'Analytics', path: '/dashboard/analytics' },
-      { icon: Calendar, label: 'Bookings', path: '/dashboard/bookings' },
-      { icon: DollarSign, label: 'Payments', path: '/dashboard/payments' },
-      { icon: MessageCircle, label: 'Messages', path: '/dashboard/messages' },
-      { icon: Megaphone, label: 'Advertisements', path: '/dashboard/ads' },
-    ];
+  const navigation = [
+    { name: 'Overview', href: '/dashboard', icon: '📊' },
+    { name: 'Analytics', href: '/dashboard/analytics', icon: '📈' },
+    { name: 'Bookings', href: '/dashboard/bookings', icon: '📅' },
+    { name: 'Payments', href: '/dashboard/payments', icon: '💳' },
+    { name: 'Messages', href: '/dashboard/messages', icon: '💬' },
+    { name: 'Advertisements', href: '/dashboard/ads', icon: '📢' },
+  ];
 
-    const serviceSpecificItems = {
-      hotel: [
-        { icon: Plus, label: 'Rooms', path: '/dashboard/rooms' },
-      ],
-      'tour-guide': [
-        { icon: MapPin, label: 'Tour Packages', path: '/dashboard/tours' },
-        { icon: Camera, label: 'Past Tours', path: '/dashboard/past-tours' },
-      ],
-      'travel-service': [
-        { icon: Car, label: 'Vehicles', path: '/dashboard/vehicles' },
-      ],
-      general: [
-        { icon: Plus, label: 'Services', path: '/dashboard/services' },
-      ]
-    };
+  const serviceNavigation = [
+    { name: 'Hotel Rooms', href: '/dashboard/rooms', icon: '🏨' },
+    { name: 'Tour Packages', href: '/dashboard/tours', icon: '🗺️' },
+    { name: 'Past Tours', href: '/dashboard/past-tours', icon: '📋' },
+    { name: 'Vehicles', href: '/dashboard/vehicles', icon: '🚗' },
+    { name: 'General Services', href: '/dashboard/services', icon: '🛎️' },
+  ];
 
-    return [...baseItems, ...(serviceSpecificItems[user?.serviceType] || [])];
+  const profileNavigation = [
+    { name: 'Profile', href: '/dashboard/profile', icon: '👤' },
+    { name: 'Settings', href: '/dashboard/settings', icon: '⚙️' },
+  ];
+
+  const isActive = (href) => {
+    if (href === '/dashboard') {
+      return location.pathname === href;
+    }
+    return location.pathname.startsWith(href);
   };
-
-  const Sidebar = ({ mobile = false }) => (
-    <div className={`${mobile ? 'lg:hidden' : 'hidden lg:block'} fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg border-r border-gray-200`}>
-      <div className="flex flex-col h-full">
-        {/* Logo */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-cyan-500 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold">JQ</span>
-            </div>
-            <div>
-              <h1 className="text-xl font-bold text-gray-900">JourneyQ</h1>
-              <p className="text-xs text-gray-500 capitalize">{user?.serviceType?.replace('-', ' ')} Dashboard</p>
-            </div>
-          </div>
-          {mobile && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setSidebarOpen(false)}
-            >
-              <X className="h-5 w-5" />
-            </Button>
-          )}
-        </div>
-
-        {/* Navigation */}
-        <nav className="flex-1 p-4 space-y-2">
-          {getNavigationItems().map((item, index) => (
-            <Button
-              key={index}
-              variant="ghost"
-              className="w-full justify-start h-12 text-gray-700 hover:text-blue-600 hover:bg-blue-50"
-              onClick={() => {
-                navigate(item.path);
-                if (mobile) setSidebarOpen(false);
-              }}
-            >
-              <item.icon className="h-5 w-5 mr-3" />
-              {item.label}
-            </Button>
-          ))}
-        </nav>
-
-        {/* User Profile */}
-        <div className="p-4 border-t border-gray-200">
-          <div className="flex items-center space-x-3 mb-4">
-            <Avatar className="h-10 w-10">
-              <AvatarImage src={user?.profileImage} />
-              <AvatarFallback className="bg-gradient-to-r from-blue-600 to-cyan-500 text-white">
-                {user?.name?.charAt(0) || 'U'}
-              </AvatarFallback>
-            </Avatar>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-gray-900 truncate">{user?.name}</p>
-              <p className="text-xs text-gray-500 truncate">{user?.businessName}</p>
-            </div>
-          </div>
-          <Button
-            variant="outline"
-            size="sm"
-            className="w-full"
-            onClick={handleLogout}
-          >
-            <LogOut className="h-4 w-4 mr-2" />
-            Sign Out
-          </Button>
-        </div>
-      </div>
-    </div>
-  );
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Desktop Sidebar */}
-      <Sidebar />
-
-      {/* Mobile Sidebar Overlay */}
-      {sidebarOpen && (
-        <div 
-          className="fixed inset-0 z-40 lg:hidden bg-black bg-opacity-50"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
-
-      {/* Mobile Sidebar */}
-      {sidebarOpen && <Sidebar mobile />}
-
-      {/* Main Content */}
-      <div className="lg:ml-64">
-        {/* Top Header */}
-        <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-30">
-          <div className="flex items-center justify-between px-4 py-4">
-            <div className="flex items-center space-x-4">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="lg:hidden"
-                onClick={() => setSidebarOpen(true)}
-              >
-                <Menu className="h-5 w-5" />
-              </Button>
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-                <p className="text-sm text-gray-500">Welcome back, {user?.name}!</p>
+      {/* Mobile sidebar */}
+      <div className={`fixed inset-0 z-40 lg:hidden ${sidebarOpen ? 'block' : 'hidden'}`}>
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-75" onClick={() => setSidebarOpen(false)} />
+        <div className="relative flex-1 flex flex-col max-w-xs w-full bg-white">
+          <div className="absolute top-0 right-0 -mr-12 pt-2">
+            <button
+              className="ml-1 flex items-center justify-center h-10 w-10 rounded-full focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"
+              onClick={() => setSidebarOpen(false)}
+            >
+              <span className="text-white">✕</span>
+            </button>
+          </div>
+          <div className="flex-1 h-0 pt-5 pb-4 overflow-y-auto">
+            <div className="flex-shrink-0 flex items-center px-4">
+              <div className="flex items-center">
+                <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-cyan-500 rounded-full flex items-center justify-center">
+                  <span className="text-white font-bold text-sm">JQ</span>
+                </div>
+                <span className="ml-2 text-xl font-bold bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">
+                  JourneyQ
+                </span>
               </div>
             </div>
+            <nav className="mt-5 px-2 space-y-1">
+              {navigation.map((item) => (
+                <Link
+                  key={item.name}
+                  to={item.href}
+                  className={`${
+                    isActive(item.href)
+                      ? 'bg-blue-100 text-blue-700'
+                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                  } group flex items-center px-2 py-2 text-sm font-medium rounded-md`}
+                  onClick={() => setSidebarOpen(false)}
+                >
+                  <span className="mr-3 text-lg">{item.icon}</span>
+                  {item.name}
+                </Link>
+              ))}
+            </nav>
+          </div>
+        </div>
+      </div>
 
-            <div className="flex items-center space-x-4">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-                    <Avatar className="h-10 w-10">
-                      <AvatarImage src={user?.profileImage} />
-                      <AvatarFallback className="bg-gradient-to-r from-blue-600 to-cyan-500 text-white">
-                        {user?.name?.charAt(0) || 'U'}
-                      </AvatarFallback>
-                    </Avatar>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56" align="end">
-                  <div className="flex items-center justify-start gap-2 p-2">
-                    <div className="flex flex-col space-y-1 leading-none">
-                      <p className="font-medium">{user?.name}</p>
-                      <p className="w-[200px] truncate text-sm text-muted-foreground">
-                        {user?.email}
-                      </p>
-                    </div>
+      {/* Desktop sidebar */}
+      <div className="hidden lg:flex lg:flex-shrink-0">
+        <div className="flex flex-col w-64">
+          <div className="flex-1 flex flex-col min-h-0 border-r border-gray-200 bg-white">
+            <div className="flex-1 flex flex-col pt-5 pb-4 overflow-y-auto">
+              <div className="flex items-center flex-shrink-0 px-4">
+                <div className="flex items-center">
+                  <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-cyan-500 rounded-full flex items-center justify-center">
+                    <span className="text-white font-bold text-sm">JQ</span>
                   </div>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => navigate('/dashboard/profile')}>
-                    <User className="mr-2 h-4 w-4" />
-                    Profile
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => navigate('/dashboard/settings')}>
-                    <Settings className="mr-2 h-4 w-4" />
-                    Settings
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleLogout}>
-                    <LogOut className="mr-2 h-4 w-4" />
-                    Sign Out
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+                  <span className="ml-2 text-xl font-bold bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">
+                    JourneyQ
+                  </span>
+                </div>
+              </div>
+              <nav className="mt-8 flex-1 px-2 space-y-1">
+                <div className="space-y-1">
+                  <h3 className="px-3 text-xs text-gray-500 uppercase tracking-wider font-semibold">
+                    Dashboard
+                  </h3>
+                  {navigation.map((item) => (
+                    <Link
+                      key={item.name}
+                      to={item.href}
+                      className={`${
+                        isActive(item.href)
+                          ? 'bg-blue-100 text-blue-700'
+                          : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                      } group flex items-center px-2 py-2 text-sm font-medium rounded-md`}
+                    >
+                      <span className="mr-3 text-lg">{item.icon}</span>
+                      {item.name}
+                    </Link>
+                  ))}
+                </div>
+
+                <div className="space-y-1 mt-8">
+                  <h3 className="px-3 text-xs text-gray-500 uppercase tracking-wider font-semibold">
+                    Services
+                  </h3>
+                  {serviceNavigation.map((item) => (
+                    <Link
+                      key={item.name}
+                      to={item.href}
+                      className={`${
+                        isActive(item.href)
+                          ? 'bg-blue-100 text-blue-700'
+                          : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                      } group flex items-center px-2 py-2 text-sm font-medium rounded-md`}
+                    >
+                      <span className="mr-3 text-lg">{item.icon}</span>
+                      {item.name}
+                    </Link>
+                  ))}
+                </div>
+
+                <div className="space-y-1 mt-8">
+                  <h3 className="px-3 text-xs text-gray-500 uppercase tracking-wider font-semibold">
+                    Account
+                  </h3>
+                  {profileNavigation.map((item) => (
+                    <Link
+                      key={item.name}
+                      to={item.href}
+                      className={`${
+                        isActive(item.href)
+                          ? 'bg-blue-100 text-blue-700'
+                          : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                      } group flex items-center px-2 py-2 text-sm font-medium rounded-md`}
+                    >
+                      <span className="mr-3 text-lg">{item.icon}</span>
+                      {item.name}
+                    </Link>
+                  ))}
+                </div>
+              </nav>
+            </div>
+            <div className="flex-shrink-0 flex border-t border-gray-200 p-4">
+              <div className="flex items-center w-full">
+                <div className="flex-shrink-0">
+                  <div className="h-8 w-8 rounded-full bg-gradient-to-r from-blue-600 to-cyan-500 flex items-center justify-center">
+                    <span className="text-white text-sm font-semibold">
+                      {user?.name?.charAt(0)?.toUpperCase() || 'U'}
+                    </span>
+                  </div>
+                </div>
+                <div className="ml-3 flex-1">
+                  <p className="text-sm font-medium text-gray-700">{user?.name}</p>
+                  <p className="text-xs text-gray-500">{user?.email}</p>
+                </div>
+                <Button
+                  onClick={handleLogout}
+                  variant="ghost"
+                  size="sm"
+                  className="ml-2 text-gray-500 hover:text-gray-700"
+                >
+                  🚪
+                </Button>
+              </div>
             </div>
           </div>
-        </header>
+        </div>
+      </div>
 
-        {/* Page Content */}
-        <main className="p-6">
-          <Outlet />
+      {/* Main content */}
+      <div className="lg:pl-64 flex flex-col flex-1">
+        {/* Top bar */}
+        <div className="relative z-10 flex-shrink-0 flex h-16 bg-white shadow lg:hidden">
+          <button
+            className="px-4 border-r border-gray-200 text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500 lg:hidden"
+            onClick={() => setSidebarOpen(true)}
+          >
+            <span className="text-xl">☰</span>
+          </button>
+          <div className="flex-1 px-4 flex justify-between">
+            <div className="flex-1 flex">
+              <div className="w-full flex md:ml-0">
+                <div className="relative w-full">
+                  <div className="flex items-center h-16">
+                    <h1 className="text-xl font-semibold text-gray-900">
+                      {user?.businessName || 'Dashboard'}
+                    </h1>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="ml-4 flex items-center md:ml-6">
+              <Button
+                onClick={handleLogout}
+                variant="ghost"
+                size="sm"
+                className="text-gray-500 hover:text-gray-700"
+              >
+                Logout
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        {/* Page content */}
+        <main className="flex-1">
+          <div className="py-6">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
+              <Outlet />
+            </div>
+          </div>
         </main>
       </div>
     </div>
