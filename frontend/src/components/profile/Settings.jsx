@@ -1,98 +1,41 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
-import { Badge } from '../ui/badge';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
-import { Switch } from '../ui/switch';
 import { useAuth } from '../../contexts/AuthContext';
 import { useToast } from '../../hooks/use-toast';
-import { 
-  Bell, 
-  Shield, 
-  CreditCard, 
-  Globe, 
-  Moon, 
-  Sun,
-  Smartphone,
-  Mail,
-  DollarSign,
-  Calendar,
-  Users,
-  Eye,
-  EyeOff,
-  Download,
-  Trash2,
-  AlertTriangle
-} from 'lucide-react';
 
 const Settings = () => {
   const { user, logout } = useAuth();
-  const [settings, setSettings] = useState({
-    // Notification Settings
-    emailNotifications: true,
-    smsNotifications: false,
-    bookingNotifications: true,
-    paymentNotifications: true,
-    reviewNotifications: true,
-    marketingEmails: false,
-    
-    // Privacy Settings
-    profileVisibility: 'public',
-    showEmail: false,
-    showPhone: false,
-    showAddress: true,
-    
-    // Business Settings
-    autoAcceptBookings: false,
-    requireDeposit: true,
-    cancellationPolicy: '24-hours',
-    
-    // Appearance
-    theme: 'light',
-    language: 'en',
-    timezone: 'UTC-5',
-    currency: 'USD'
-  });
-  
+  const { toast } = useToast();
   const [passwordData, setPasswordData] = useState({
     currentPassword: '',
     newPassword: '',
     confirmPassword: ''
   });
-  
-  const [showPasswords, setShowPasswords] = useState({
-    current: false,
-    new: false,
-    confirm: false
+  const [notifications, setNotifications] = useState({
+    emailBookings: true,
+    emailPromotions: false,
+    smsReminders: true,
+    pushNotifications: true
+  });
+  const [privacy, setPrivacy] = useState({
+    profileVisible: true,
+    showContactInfo: true,
+    allowReviews: true,
+    showBusinessHours: true
   });
 
-  const { toast } = useToast();
-
-  const handleSettingChange = (key, value) => {
-    setSettings(prev => ({
-      ...prev,
-      [key]: value
-    }));
-    
-    // In a real app, you'd save this to the backend
-    toast({
-      title: "Setting Updated",
-      description: "Your preference has been saved",
+  const handlePasswordChange = (e) => {
+    setPasswordData({
+      ...passwordData,
+      [e.target.name]: e.target.value
     });
   };
 
-  const handlePasswordChange = () => {
-    if (!passwordData.currentPassword || !passwordData.newPassword || !passwordData.confirmPassword) {
-      toast({
-        title: "Missing Information",
-        description: "Please fill in all password fields",
-        variant: "destructive"
-      });
-      return;
-    }
-
+  const handlePasswordSubmit = (e) => {
+    e.preventDefault();
     if (passwordData.newPassword !== passwordData.confirmPassword) {
       toast({
         title: "Password Mismatch",
@@ -101,7 +44,6 @@ const Settings = () => {
       });
       return;
     }
-
     if (passwordData.newPassword.length < 6) {
       toast({
         title: "Weak Password",
@@ -110,136 +52,202 @@ const Settings = () => {
       });
       return;
     }
-
-    // In a real app, you'd send this to the backend
-    setPasswordData({
-      currentPassword: '',
-      newPassword: '',
-      confirmPassword: ''
-    });
-
+    
+    // Mock password change
     toast({
       title: "Password Updated",
-      description: "Your password has been changed successfully",
+      description: "Your password has been successfully changed"
+    });
+    setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
+  };
+
+  const handleNotificationChange = (key) => {
+    setNotifications({
+      ...notifications,
+      [key]: !notifications[key]
     });
   };
 
-  const handleExportData = () => {
+  const handlePrivacyChange = (key) => {
+    setPrivacy({
+      ...privacy,
+      [key]: !privacy[key]
+    });
+  };
+
+  const handleSaveSettings = () => {
     toast({
-      title: "Data Export Started",
-      description: "Your data export will be emailed to you within 24 hours",
+      title: "Settings Saved",
+      description: "Your preferences have been updated successfully"
     });
   };
 
   const handleDeleteAccount = () => {
-    // In a real app, this would show a confirmation dialog
     if (window.confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
       toast({
         title: "Account Deletion",
-        description: "Please contact support to complete account deletion",
+        description: "Account deletion request submitted. You will receive an email with further instructions.",
         variant: "destructive"
       });
     }
   };
 
-  const togglePasswordVisibility = (field) => {
-    setShowPasswords(prev => ({
-      ...prev,
-      [field]: !prev[field]
-    }));
-  };
-
   return (
-    <div className="space-y-8 animate-fade-in">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Settings</h1>
-          <p className="text-gray-600">Manage your account preferences and security settings</p>
-        </div>
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-3xl font-bold text-gray-900">Settings</h1>
+        <p className="text-gray-600 mt-2">Manage your account preferences and security settings</p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Notification Settings */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Account Security */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center">
-              <Bell className="h-5 w-5 mr-2" />
-              Notifications
+              <span className="mr-2">🔒</span>
+              Account Security
             </CardTitle>
-            <CardDescription>Choose what notifications you want to receive</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex items-center justify-between">
+            <form onSubmit={handlePasswordSubmit} className="space-y-4">
               <div>
-                <Label htmlFor="email-notifications">Email Notifications</Label>
-                <p className="text-sm text-gray-500">Receive notifications via email</p>
+                <Label htmlFor="currentPassword">Current Password</Label>
+                <Input
+                  id="currentPassword"
+                  name="currentPassword"
+                  type="password"
+                  value={passwordData.currentPassword}
+                  onChange={handlePasswordChange}
+                  placeholder="Enter current password"
+                />
               </div>
-              <Switch
-                id="email-notifications"
-                checked={settings.emailNotifications}
-                onCheckedChange={(checked) => handleSettingChange('emailNotifications', checked)}
-              />
+              <div>
+                <Label htmlFor="newPassword">New Password</Label>
+                <Input
+                  id="newPassword"
+                  name="newPassword"
+                  type="password"
+                  value={passwordData.newPassword}
+                  onChange={handlePasswordChange}
+                  placeholder="Enter new password"
+                />
+              </div>
+              <div>
+                <Label htmlFor="confirmPassword">Confirm New Password</Label>
+                <Input
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  type="password"
+                  value={passwordData.confirmPassword}
+                  onChange={handlePasswordChange}
+                  placeholder="Confirm new password"
+                />
+              </div>
+              <Button type="submit" className="w-full">
+                Update Password
+              </Button>
+            </form>
+
+            <div className="border-t pt-4">
+              <h4 className="font-medium text-gray-900 mb-3">Two-Factor Authentication</h4>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600">Add an extra layer of security</p>
+                  <p className="text-xs text-gray-500">Status: Not Enabled</p>
+                </div>
+                <Button size="sm" variant="outline">
+                  Enable 2FA
+                </Button>
+              </div>
             </div>
-            
-            <div className="flex items-center justify-between">
-              <div>
-                <Label htmlFor="sms-notifications">SMS Notifications</Label>
-                <p className="text-sm text-gray-500">Receive notifications via text message</p>
+          </CardContent>
+        </Card>
+
+        {/* Notification Preferences */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center">
+              <span className="mr-2">🔔</span>
+              Notification Preferences
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-900">Email - New Bookings</p>
+                  <p className="text-xs text-gray-500">Get notified when you receive new bookings</p>
+                </div>
+                <button
+                  onClick={() => handleNotificationChange('emailBookings')}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                    notifications.emailBookings ? 'bg-blue-600' : 'bg-gray-300'
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                      notifications.emailBookings ? 'translate-x-6' : 'translate-x-1'
+                    }`}
+                  />
+                </button>
               </div>
-              <Switch
-                id="sms-notifications"
-                checked={settings.smsNotifications}
-                onCheckedChange={(checked) => handleSettingChange('smsNotifications', checked)}
-              />
-            </div>
-            
-            <div className="flex items-center justify-between">
-              <div>
-                <Label htmlFor="booking-notifications">New Bookings</Label>
-                <p className="text-sm text-gray-500">Get notified of new booking requests</p>
+
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-900">Email - Promotions</p>
+                  <p className="text-xs text-gray-500">Receive marketing emails and offers</p>
+                </div>
+                <button
+                  onClick={() => handleNotificationChange('emailPromotions')}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                    notifications.emailPromotions ? 'bg-blue-600' : 'bg-gray-300'
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                      notifications.emailPromotions ? 'translate-x-6' : 'translate-x-1'
+                    }`}
+                  />
+                </button>
               </div>
-              <Switch
-                id="booking-notifications"
-                checked={settings.bookingNotifications}
-                onCheckedChange={(checked) => handleSettingChange('bookingNotifications', checked)}
-              />
-            </div>
-            
-            <div className="flex items-center justify-between">
-              <div>
-                <Label htmlFor="payment-notifications">Payment Updates</Label>
-                <p className="text-sm text-gray-500">Get notified of payment confirmations</p>
+
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-900">SMS Reminders</p>
+                  <p className="text-xs text-gray-500">Get text reminders for upcoming tours</p>
+                </div>
+                <button
+                  onClick={() => handleNotificationChange('smsReminders')}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                    notifications.smsReminders ? 'bg-blue-600' : 'bg-gray-300'
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                      notifications.smsReminders ? 'translate-x-6' : 'translate-x-1'
+                    }`}
+                  />
+                </button>
               </div>
-              <Switch
-                id="payment-notifications"
-                checked={settings.paymentNotifications}
-                onCheckedChange={(checked) => handleSettingChange('paymentNotifications', checked)}
-              />
-            </div>
-            
-            <div className="flex items-center justify-between">
-              <div>
-                <Label htmlFor="review-notifications">New Reviews</Label>
-                <p className="text-sm text-gray-500">Get notified when customers leave reviews</p>
+
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-900">Push Notifications</p>
+                  <p className="text-xs text-gray-500">Receive notifications in your browser</p>
+                </div>
+                <button
+                  onClick={() => handleNotificationChange('pushNotifications')}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                    notifications.pushNotifications ? 'bg-blue-600' : 'bg-gray-300'
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                      notifications.pushNotifications ? 'translate-x-6' : 'translate-x-1'
+                    }`}
+                  />
+                </button>
               </div>
-              <Switch
-                id="review-notifications"
-                checked={settings.reviewNotifications}
-                onCheckedChange={(checked) => handleSettingChange('reviewNotifications', checked)}
-              />
-            </div>
-            
-            <div className="flex items-center justify-between">
-              <div>
-                <Label htmlFor="marketing-emails">Marketing Emails</Label>
-                <p className="text-sm text-gray-500">Receive tips and promotional content</p>
-              </div>
-              <Switch
-                id="marketing-emails"
-                checked={settings.marketingEmails}
-                onCheckedChange={(checked) => handleSettingChange('marketingEmails', checked)}
-              />
             </div>
           </CardContent>
         </Card>
@@ -248,332 +256,158 @@ const Settings = () => {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center">
-              <Shield className="h-5 w-5 mr-2" />
-              Privacy & Visibility
+              <span className="mr-2">🛡️</span>
+              Privacy Settings
             </CardTitle>
-            <CardDescription>Control what information is visible to customers</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div>
-              <Label htmlFor="profile-visibility">Profile Visibility</Label>
-              <Select
-                value={settings.profileVisibility}
-                onValueChange={(value) => handleSettingChange('profileVisibility', value)}
-              >
-                <SelectTrigger className="mt-1">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="public">Public - Anyone can see</SelectItem>
-                  <SelectItem value="customers">Customers Only</SelectItem>
-                  <SelectItem value="private">Private - Hidden</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div className="flex items-center justify-between">
-              <div>
-                <Label htmlFor="show-email">Show Email Address</Label>
-                <p className="text-sm text-gray-500">Display email on public profile</p>
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-900">Profile Visibility</p>
+                  <p className="text-xs text-gray-500">Make your profile visible to customers</p>
+                </div>
+                <button
+                  onClick={() => handlePrivacyChange('profileVisible')}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                    privacy.profileVisible ? 'bg-blue-600' : 'bg-gray-300'
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                      privacy.profileVisible ? 'translate-x-6' : 'translate-x-1'
+                    }`}
+                  />
+                </button>
               </div>
-              <Switch
-                id="show-email"
-                checked={settings.showEmail}
-                onCheckedChange={(checked) => handleSettingChange('showEmail', checked)}
-              />
-            </div>
-            
-            <div className="flex items-center justify-between">
-              <div>
-                <Label htmlFor="show-phone">Show Phone Number</Label>
-                <p className="text-sm text-gray-500">Display phone on public profile</p>
+
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-900">Show Contact Information</p>
+                  <p className="text-xs text-gray-500">Display phone and email on your profile</p>
+                </div>
+                <button
+                  onClick={() => handlePrivacyChange('showContactInfo')}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                    privacy.showContactInfo ? 'bg-blue-600' : 'bg-gray-300'
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                      privacy.showContactInfo ? 'translate-x-6' : 'translate-x-1'
+                    }`}
+                  />
+                </button>
               </div>
-              <Switch
-                id="show-phone"
-                checked={settings.showPhone}
-                onCheckedChange={(checked) => handleSettingChange('showPhone', checked)}
-              />
-            </div>
-            
-            <div className="flex items-center justify-between">
-              <div>
-                <Label htmlFor="show-address">Show Business Address</Label>
-                <p className="text-sm text-gray-500">Display address on public profile</p>
+
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-900">Allow Reviews</p>
+                  <p className="text-xs text-gray-500">Let customers leave reviews on your services</p>
+                </div>
+                <button
+                  onClick={() => handlePrivacyChange('allowReviews')}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                    privacy.allowReviews ? 'bg-blue-600' : 'bg-gray-300'
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                      privacy.allowReviews ? 'translate-x-6' : 'translate-x-1'
+                    }`}
+                  />
+                </button>
               </div>
-              <Switch
-                id="show-address"
-                checked={settings.showAddress}
-                onCheckedChange={(checked) => handleSettingChange('showAddress', checked)}
-              />
+
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-900">Show Business Hours</p>
+                  <p className="text-xs text-gray-500">Display your operating hours publicly</p>
+                </div>
+                <button
+                  onClick={() => handlePrivacyChange('showBusinessHours')}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                    privacy.showBusinessHours ? 'bg-blue-600' : 'bg-gray-300'
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                      privacy.showBusinessHours ? 'translate-x-6' : 'translate-x-1'
+                    }`}
+                  />
+                </button>
+              </div>
             </div>
           </CardContent>
         </Card>
 
-        {/* Business Settings */}
+        {/* Billing & Subscription */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center">
-              <Users className="h-5 w-5 mr-2" />
-              Business Preferences
+              <span className="mr-2">💳</span>
+              Billing & Subscription
             </CardTitle>
-            <CardDescription>Configure how your business operates</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <Label htmlFor="auto-accept">Auto-Accept Bookings</Label>
-                <p className="text-sm text-gray-500">Automatically accept booking requests</p>
+            <div className="bg-blue-50 p-4 rounded-lg">
+              <div className="flex items-center justify-between mb-2">
+                <h4 className="font-medium text-gray-900">Current Plan</h4>
+                <span className="bg-blue-100 text-blue-800 text-sm px-2 py-1 rounded">Professional</span>
               </div>
-              <Switch
-                id="auto-accept"
-                checked={settings.autoAcceptBookings}
-                onCheckedChange={(checked) => handleSettingChange('autoAcceptBookings', checked)}
-              />
-            </div>
-            
-            <div className="flex items-center justify-between">
-              <div>
-                <Label htmlFor="require-deposit">Require Deposit</Label>
-                <p className="text-sm text-gray-500">Require upfront payment for bookings</p>
+              <p className="text-sm text-gray-600 mb-3">
+                Access to all features and unlimited bookings
+              </p>
+              <div className="flex items-center justify-between">
+                <span className="text-lg font-bold text-gray-900">$29.99/month</span>
+                <Button size="sm" variant="outline">
+                  Change Plan
+                </Button>
               </div>
-              <Switch
-                id="require-deposit"
-                checked={settings.requireDeposit}
-                onCheckedChange={(checked) => handleSettingChange('requireDeposit', checked)}
-              />
             </div>
-            
-            <div>
-              <Label htmlFor="cancellation-policy">Cancellation Policy</Label>
-              <Select
-                value={settings.cancellationPolicy}
-                onValueChange={(value) => handleSettingChange('cancellationPolicy', value)}
-              >
-                <SelectTrigger className="mt-1">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="flexible">Flexible - Free cancellation</SelectItem>
-                  <SelectItem value="24-hours">24 Hours Notice Required</SelectItem>
-                  <SelectItem value="48-hours">48 Hours Notice Required</SelectItem>
-                  <SelectItem value="strict">Strict - No refunds</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </CardContent>
-        </Card>
 
-        {/* Appearance Settings */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <Globe className="h-5 w-5 mr-2" />
-              Appearance & Localization
-            </CardTitle>
-            <CardDescription>Customize your dashboard appearance</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <Label htmlFor="theme">Theme</Label>
-              <Select
-                value={settings.theme}
-                onValueChange={(value) => handleSettingChange('theme', value)}
-              >
-                <SelectTrigger className="mt-1">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="light">
-                    <div className="flex items-center">
-                      <Sun className="h-4 w-4 mr-2" />
-                      Light
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="dark">
-                    <div className="flex items-center">
-                      <Moon className="h-4 w-4 mr-2" />
-                      Dark
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="auto">Auto (System)</SelectItem>
-                </SelectContent>
-              </Select>
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-600">Next billing date</span>
+                <span className="text-sm font-medium text-gray-900">April 15, 2024</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-600">Payment method</span>
+                <span className="text-sm font-medium text-gray-900">**** 4532</span>
+              </div>
             </div>
-            
-            <div>
-              <Label htmlFor="language">Language</Label>
-              <Select
-                value={settings.language}
-                onValueChange={(value) => handleSettingChange('language', value)}
-              >
-                <SelectTrigger className="mt-1">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="en">English</SelectItem>
-                  <SelectItem value="es">Español</SelectItem>
-                  <SelectItem value="fr">Français</SelectItem>
-                  <SelectItem value="de">Deutsch</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div>
-              <Label htmlFor="timezone">Timezone</Label>
-              <Select
-                value={settings.timezone}
-                onValueChange={(value) => handleSettingChange('timezone', value)}
-              >
-                <SelectTrigger className="mt-1">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="UTC-5">Eastern Time (UTC-5)</SelectItem>
-                  <SelectItem value="UTC-6">Central Time (UTC-6)</SelectItem>
-                  <SelectItem value="UTC-7">Mountain Time (UTC-7)</SelectItem>
-                  <SelectItem value="UTC-8">Pacific Time (UTC-8)</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div>
-              <Label htmlFor="currency">Currency</Label>
-              <Select
-                value={settings.currency}
-                onValueChange={(value) => handleSettingChange('currency', value)}
-              >
-                <SelectTrigger className="mt-1">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="USD">USD - US Dollar</SelectItem>
-                  <SelectItem value="EUR">EUR - Euro</SelectItem>
-                  <SelectItem value="GBP">GBP - British Pound</SelectItem>
-                  <SelectItem value="CAD">CAD - Canadian Dollar</SelectItem>
-                </SelectContent>
-              </Select>
+
+            <div className="flex space-x-2">
+              <Button size="sm" variant="outline" className="flex-1">
+                Update Payment
+              </Button>
+              <Button size="sm" variant="outline" className="flex-1">
+                Billing History
+              </Button>
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Security Section */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center">
-            <Shield className="h-5 w-5 mr-2" />
-            Security & Password
-          </CardTitle>
-          <CardDescription>Manage your account security settings</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <Label htmlFor="current-password">Current Password</Label>
-              <div className="relative">
-                <Input
-                  id="current-password"
-                  type={showPasswords.current ? "text" : "password"}
-                  value={passwordData.currentPassword}
-                  onChange={(e) => setPasswordData({...passwordData, currentPassword: e.target.value})}
-                  placeholder="Enter current password"
-                />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  className="absolute right-2 top-1/2 transform -translate-y-1/2 h-auto p-1"
-                  onClick={() => togglePasswordVisibility('current')}
-                >
-                  {showPasswords.current ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </Button>
-              </div>
-            </div>
-            
-            <div>
-              <Label htmlFor="new-password">New Password</Label>
-              <div className="relative">
-                <Input
-                  id="new-password"
-                  type={showPasswords.new ? "text" : "password"}
-                  value={passwordData.newPassword}
-                  onChange={(e) => setPasswordData({...passwordData, newPassword: e.target.value})}
-                  placeholder="Enter new password"
-                />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  className="absolute right-2 top-1/2 transform -translate-y-1/2 h-auto p-1"
-                  onClick={() => togglePasswordVisibility('new')}
-                >
-                  {showPasswords.new ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </Button>
-              </div>
-            </div>
-            
-            <div>
-              <Label htmlFor="confirm-password">Confirm New Password</Label>
-              <div className="relative">
-                <Input
-                  id="confirm-password"
-                  type={showPasswords.confirm ? "text" : "password"}
-                  value={passwordData.confirmPassword}
-                  onChange={(e) => setPasswordData({...passwordData, confirmPassword: e.target.value})}
-                  placeholder="Confirm new password"
-                />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  className="absolute right-2 top-1/2 transform -translate-y-1/2 h-auto p-1"
-                  onClick={() => togglePasswordVisibility('confirm')}
-                >
-                  {showPasswords.confirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </Button>
-              </div>
-            </div>
-          </div>
-          
-          <Button onClick={handlePasswordChange} className="bg-blue-600 hover:bg-blue-700">
-            Update Password
+      {/* Action Buttons */}
+      <div className="flex justify-between items-center pt-6 border-t">
+        <Button onClick={handleSaveSettings} className="bg-green-600 hover:bg-green-700">
+          Save All Settings
+        </Button>
+        
+        <div className="flex space-x-4">
+          <Button variant="outline" onClick={logout}>
+            Sign Out
           </Button>
-        </CardContent>
-      </Card>
-
-      {/* Data & Account Management */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center">
-            <AlertTriangle className="h-5 w-5 mr-2" />
-            Data & Account Management
-          </CardTitle>
-          <CardDescription>Export your data or delete your account</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center justify-between p-4 border rounded-lg">
-            <div>
-              <h4 className="font-medium">Export Account Data</h4>
-              <p className="text-sm text-gray-500">Download a copy of all your account data</p>
-            </div>
-            <Button variant="outline" onClick={handleExportData}>
-              <Download className="h-4 w-4 mr-2" />
-              Export Data
-            </Button>
-          </div>
-          
-          <div className="flex items-center justify-between p-4 border border-red-200 rounded-lg bg-red-50">
-            <div>
-              <h4 className="font-medium text-red-900">Delete Account</h4>
-              <p className="text-sm text-red-700">Permanently delete your account and all data</p>
-            </div>
-            <Button variant="destructive" onClick={handleDeleteAccount}>
-              <Trash2 className="h-4 w-4 mr-2" />
-              Delete Account
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+          <Button 
+            variant="destructive" 
+            onClick={handleDeleteAccount}
+            className="bg-red-600 hover:bg-red-700"
+          >
+            Delete Account
+          </Button>
+        </div>
+      </div>
     </div>
   );
 };
