@@ -9,6 +9,11 @@ import Signup from "./components/auth/Signup";
 import DashboardLayout from "./components/layout/DashboardLayout";
 import Overview from "./components/dashboard/Overview";
 import Analytics from "./components/dashboard/Analytics";
+import Bookings from "./components/dashboard/Bookings";
+import Payments from "./components/dashboard/Payments";
+import Messages from "./components/dashboard/Messages";
+import Advertisements from "./components/dashboard/Advertisements";
+import HotelRooms from "./components/services/HotelRooms";
 import "./styles/theme.css";
 
 function App() {
@@ -29,11 +34,11 @@ function App() {
             }>
               <Route index element={<Overview />} />
               <Route path="analytics" element={<Analytics />} />
-              <Route path="bookings" element={<div className="p-8 text-center text-gray-500">Bookings component coming soon...</div>} />
-              <Route path="payments" element={<div className="p-8 text-center text-gray-500">Payments component coming soon...</div>} />
-              <Route path="messages" element={<div className="p-8 text-center text-gray-500">Messages component coming soon...</div>} />
-              <Route path="ads" element={<div className="p-8 text-center text-gray-500">Advertisements component coming soon...</div>} />
-              <Route path="rooms" element={<div className="p-8 text-center text-gray-500">Rooms component coming soon...</div>} />
+              <Route path="bookings" element={<Bookings />} />
+              <Route path="payments" element={<Payments />} />
+              <Route path="messages" element={<Messages />} />
+              <Route path="ads" element={<Advertisements />} />
+              <Route path="rooms" element={<HotelRooms />} />
               <Route path="tours" element={<div className="p-8 text-center text-gray-500">Tour Packages component coming soon...</div>} />
               <Route path="past-tours" element={<div className="p-8 text-center text-gray-500">Past Tours component coming soon...</div>} />
               <Route path="vehicles" element={<div className="p-8 text-center text-gray-500">Vehicles component coming soon...</div>} />
