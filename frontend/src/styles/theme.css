@@ -1,0 +1,90 @@
+/* JourneyQ Theme Colors */
+:root {
+  /* Primary colors - converted from Flutter theme */
+  --primary-blue: #0088cc;
+  --light-blue-bg: #F8FAFC;
+  
+  /* Gradient colors */
+  --gradient-dark-blue: #1E3A8A;
+  --gradient-medium-blue: #3B82F6;
+  --gradient-cyan: #06B6D4;
+  
+  /* Extended palette */
+  --primary-50: #E6F3FA;
+  --primary-100: #CCE7F5;
+  --primary-200: #99CFEB;
+  --primary-300: #66B7E1;
+  --primary-400: #339FD7;
+  --primary-500: #0088cc;
+  --primary-600: #006DA3;
+  --primary-700: #00527A;
+  --primary-800: #003752;
+  --primary-900: #001C29;
+  
+  /* Secondary colors */
+  --secondary-blue: #33a3dd;
+  
+  /* Status colors */
+  --success: #10B981;
+  --warning: #F59E0B;
+  --error: #EF4444;
+  --info: var(--primary-blue);
+}
+
+/* Custom gradients */
+.gradient-journeyq {
+  background: linear-gradient(135deg, var(--gradient-dark-blue) 0%, var(--gradient-medium-blue) 50%, var(--gradient-cyan) 100%);
+}
+
+.gradient-journeyq-subtle {
+  background: linear-gradient(135deg, var(--primary-100) 0%, var(--primary-50) 100%);
+}
+
+/* Glass morphism effect */
+.glass-morphism {
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+/* Animation utilities */
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.animate-slide-up {
+  animation: slideUp 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Hover effects */
+.hover-scale {
+  transition: transform 0.2s ease-in-out;
+}
+
+.hover-scale:hover {
+  transform: scale(1.02);
+}
+
+.hover-glow {
+  transition: box-shadow 0.2s ease-in-out;
+}
+
+.hover-glow:hover {
+  box-shadow: 0 0 20px rgba(0, 136, 204, 0.3);
+}
