@@ -18,6 +18,8 @@ import TourPackages from "./components/services/TourPackages";
 import PastTours from "./components/services/PastTours";
 import Vehicles from "./components/services/Vehicles";
 import GeneralServices from "./components/services/GeneralServices";
+import Profile from "./components/profile/Profile";
+import Settings from "./components/profile/Settings";
 import "./styles/theme.css";
 
 function App() {
@@ -47,8 +49,8 @@ function App() {
               <Route path="past-tours" element={<PastTours />} />
               <Route path="vehicles" element={<Vehicles />} />
               <Route path="services" element={<GeneralServices />} />
-              <Route path="profile" element={<div className="p-8 text-center text-gray-500">Profile component coming soon...</div>} />
-              <Route path="settings" element={<div className="p-8 text-center text-gray-500">Settings component coming soon...</div>} />
+              <Route path="profile" element={<Profile />} />
+              <Route path="settings" element={<Settings />} />
             </Route>
             
             {/* Redirect root to dashboard */}
