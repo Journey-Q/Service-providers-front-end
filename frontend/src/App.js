@@ -1,53 +1,54 @@
-import { useEffect } from "react";
+import React from "react";
 import "./App.css";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import axios from "axios";
-
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
-
-const Home = () => {
-  const helloWorldApi = async () => {
-    try {
-      const response = await axios.get(`${API}/`);
-      console.log(response.data.message);
-    } catch (e) {
-      console.error(e, `errored out requesting / api`);
-    }
-  };
-
-  useEffect(() => {
-    helloWorldApi();
-  }, []);
-
-  return (
-    <div>
-      <header className="App-header">
-        <a
-          className="App-link"
-          href="https://emergent.sh"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <img src="https://avatars.githubusercontent.com/in/1201222?s=120&u=2686cf91179bbafbc7a71bfbc43004cf9ae1acea&v=4" />
-        </a>
-        <p className="mt-5">Building something incredible ~!</p>
-      </header>
-    </div>
-  );
-};
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { AuthProvider } from "./contexts/AuthContext";
+import { Toaster } from "./components/ui/toaster";
+import ProtectedRoute from "./components/ProtectedRoute";
+import Login from "./components/auth/Login";
+import Signup from "./components/auth/Signup";
+import DashboardLayout from "./components/layout/DashboardLayout";
+import Overview from "./components/dashboard/Overview";
+import Analytics from "./components/dashboard/Analytics";
+import "./styles/theme.css";
 
 function App() {
   return (
-    <div className="App">
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Home />}>
-            <Route index element={<Home />} />
-          </Route>
-        </Routes>
-      </BrowserRouter>
-    </div>
+    <AuthProvider>
+      <div className="App">
+        <BrowserRouter>
+          <Routes>
+            {/* Public Routes */}
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+            
+            {/* Protected Dashboard Routes */}
+            <Route path="/dashboard" element={
+              <ProtectedRoute>
+                <DashboardLayout />
+              </ProtectedRoute>
+            }>
+              <Route index element={<Overview />} />
+              <Route path="analytics" element={<Analytics />} />
+              <Route path="bookings" element={<div className="p-8 text-center text-gray-500">Bookings component coming soon...</div>} />
+              <Route path="payments" element={<div className="p-8 text-center text-gray-500">Payments component coming soon...</div>} />
+              <Route path="messages" element={<div className="p-8 text-center text-gray-500">Messages component coming soon...</div>} />
+              <Route path="ads" element={<div className="p-8 text-center text-gray-500">Advertisements component coming soon...</div>} />
+              <Route path="rooms" element={<div className="p-8 text-center text-gray-500">Rooms component coming soon...</div>} />
+              <Route path="tours" element={<div className="p-8 text-center text-gray-500">Tour Packages component coming soon...</div>} />
+              <Route path="past-tours" element={<div className="p-8 text-center text-gray-500">Past Tours component coming soon...</div>} />
+              <Route path="vehicles" element={<div className="p-8 text-center text-gray-500">Vehicles component coming soon...</div>} />
+              <Route path="services" element={<div className="p-8 text-center text-gray-500">Services component coming soon...</div>} />
+              <Route path="profile" element={<div className="p-8 text-center text-gray-500">Profile component coming soon...</div>} />
+              <Route path="settings" element={<div className="p-8 text-center text-gray-500">Settings component coming soon...</div>} />
+            </Route>
+            
+            {/* Redirect root to dashboard */}
+            <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          </Routes>
+        </BrowserRouter>
+        <Toaster />
+      </div>
+    </AuthProvider>
   );
 }
 
