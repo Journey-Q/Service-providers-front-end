@@ -1,31 +1,10 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Button } from '../ui/button';
-import { Badge } from '../ui/badge';
 import { Input } from '../ui/input';
-import { Textarea } from '../ui/textarea';
 import { Label } from '../ui/label';
-import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
-import { Switch } from '../ui/switch';
+import { Textarea } from '../ui/textarea';
 import { useAuth } from '../../contexts/AuthContext';
-import { useToast } from '../../hooks/use-toast';
-import { 
-  User, 
-  Mail, 
-  Phone, 
-  MapPin, 
-  Camera, 
-  Star,
-  Calendar,
-  DollarSign,
-  Users,
-  Edit,
-  Save,
-  Upload,
-  Building,
-  Globe,
-  Clock
-} from 'lucide-react';
 
 const Profile = () => {
   const { user, updateProfile } = useAuth();
@@ -33,409 +12,339 @@ const Profile = () => {
   const [formData, setFormData] = useState({
     name: user?.name || '',
     email: user?.email || '',
+    businessName: user?.businessName || '',
     phone: user?.phone || '',
     address: user?.address || '',
-    businessName: user?.businessName || '',
-    description: user?.description || '',
+    serviceType: user?.serviceType || '',
+    bio: user?.bio || 'Passionate about providing exceptional travel experiences...',
     website: user?.website || '',
-    operatingHours: user?.operatingHours || '',
-    profileImage: user?.profileImage || null
+    languages: user?.languages || 'English, Spanish',
+    experience: user?.experience || '5+ years'
   });
-  const { toast } = useToast();
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
 
   const handleSave = () => {
     updateProfile(formData);
     setIsEditing(false);
-    toast({
-      title: "Profile Updated",
-      description: "Your profile has been saved successfully",
-    });
   };
 
   const handleCancel = () => {
     setFormData({
       name: user?.name || '',
       email: user?.email || '',
+      businessName: user?.businessName || '',
       phone: user?.phone || '',
       address: user?.address || '',
-      businessName: user?.businessName || '',
-      description: user?.description || '',
+      serviceType: user?.serviceType || '',
+      bio: user?.bio || 'Passionate about providing exceptional travel experiences...',
       website: user?.website || '',
-      operatingHours: user?.operatingHours || '',
-      profileImage: user?.profileImage || null
+      languages: user?.languages || 'English, Spanish',
+      experience: user?.experience || '5+ years'
     });
     setIsEditing(false);
   };
 
-  const handleImageUpload = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      // In a real app, you would upload to a server
-      // For now, we'll use a placeholder
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setFormData({ ...formData, profileImage: e.target.result });
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const getServiceTypeLabel = (type) => {
-    const labels = {
-      'hotel': 'Hotel Provider',
-      'tour-guide': 'Tour Guide',
-      'travel-service': 'Travel Service',
-      'general': 'General Service Provider'
-    };
-    return labels[type] || type;
-  };
-
-  // Mock statistics (in a real app, these would come from the backend)
-  const stats = {
-    totalBookings: 156,
-    totalRevenue: 24680,
-    avgRating: 4.7,
-    totalReviews: 89,
-    memberSince: user?.joinedDate || '2023-01-15',
-    responseRate: 95,
-    responseTime: '2.3 hours'
+  const serviceTypeLabels = {
+    'hotel': 'Hotel Provider',
+    'tour-guide': 'Tour Guide',
+    'travel-service': 'Travel Service',
+    'general': 'General Service Provider'
   };
 
   return (
-    <div className="space-y-8 animate-fade-in">
-      {/* Header */}
-      <div className="flex items-center justify-between">
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Profile</h1>
-          <p className="text-gray-600">Manage your business profile and information</p>
+          <p className="text-gray-600 mt-2">Manage your professional profile and business information</p>
         </div>
-        <div className="flex items-center space-x-4">
-          {isEditing ? (
-            <>
-              <Button variant="outline" onClick={handleCancel}>
-                Cancel
-              </Button>
-              <Button onClick={handleSave} className="bg-blue-600 hover:bg-blue-700">
-                <Save className="h-4 w-4 mr-2" />
-                Save Changes
-              </Button>
-            </>
-          ) : (
-            <Button onClick={() => setIsEditing(true)} className="bg-blue-600 hover:bg-blue-700">
-              <Edit className="h-4 w-4 mr-2" />
-              Edit Profile
+        {!isEditing ? (
+          <Button onClick={() => setIsEditing(true)} className="bg-blue-600 hover:bg-blue-700">
+            <span className="mr-2">✏️</span>
+            Edit Profile
+          </Button>
+        ) : (
+          <div className="flex space-x-2">
+            <Button onClick={handleSave} className="bg-green-600 hover:bg-green-700">
+              Save Changes
             </Button>
-          )}
-        </div>
+            <Button onClick={handleCancel} variant="outline">
+              Cancel
+            </Button>
+          </div>
+        )}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Profile Overview */}
-        <div className="lg:col-span-1 space-y-6">
+        <div className="lg:col-span-1">
           <Card>
-            <CardContent className="p-6">
-              <div className="text-center">
-                <div className="relative inline-block mb-4">
-                  <Avatar className="h-24 w-24 mx-auto">
-                    <AvatarImage src={formData.profileImage} />
-                    <AvatarFallback className="bg-gradient-to-r from-blue-600 to-cyan-500 text-white text-xl">
-                      {formData.name?.charAt(0) || 'U'}
-                    </AvatarFallback>
-                  </Avatar>
-                  {isEditing && (
-                    <label htmlFor="profile-image" className="absolute bottom-0 right-0 bg-blue-600 rounded-full p-2 cursor-pointer hover:bg-blue-700 transition-colors">
-                      <Camera className="h-4 w-4 text-white" />
-                      <input
-                        id="profile-image"
-                        type="file"
-                        accept="image/*"
-                        onChange={handleImageUpload}
-                        className="hidden"
-                      />
-                    </label>
-                  )}
+            <CardContent className="text-center p-6">
+              <div className="mb-4">
+                <div className="w-24 h-24 mx-auto bg-gradient-to-r from-blue-600 to-cyan-500 rounded-full flex items-center justify-center">
+                  <span className="text-3xl font-bold text-white">
+                    {user?.name?.charAt(0)?.toUpperCase() || 'U'}
+                  </span>
                 </div>
-                
-                <h2 className="text-xl font-bold text-gray-900 mb-1">{user?.name}</h2>
-                <Badge className="mb-2">
-                  {getServiceTypeLabel(user?.serviceType)}
-                </Badge>
-                
-                <div className="space-y-2 text-sm text-gray-600">
-                  <div className="flex items-center justify-center">
-                    <Building className="h-4 w-4 mr-2" />
-                    {user?.businessName}
+              </div>
+              <h2 className="text-xl font-bold text-gray-900 mb-1">{user?.name}</h2>
+              <p className="text-gray-600 mb-3">{serviceTypeLabels[user?.serviceType] || user?.serviceType}</p>
+              <p className="text-sm text-gray-500 mb-4">{user?.businessName}</p>
+              
+              <div className="border-t pt-4">
+                <div className="grid grid-cols-2 gap-4 text-center">
+                  <div>
+                    <div className="text-2xl font-bold text-blue-600">{user?.rating || 4.8}</div>
+                    <div className="text-xs text-gray-600">Rating</div>
                   </div>
-                  <div className="flex items-center justify-center">
-                    <Calendar className="h-4 w-4 mr-2" />
-                    Member since {new Date(stats.memberSince).getFullYear()}
+                  <div>
+                    <div className="text-2xl font-bold text-green-600">{user?.totalReviews || 127}</div>
+                    <div className="text-xs text-gray-600">Reviews</div>
                   </div>
                 </div>
-
-                {stats.avgRating > 0 && (
-                  <div className="flex items-center justify-center mt-4 space-x-2">
-                    <Star className="h-5 w-5 text-yellow-400 fill-current" />
-                    <span className="font-semibold">{stats.avgRating}</span>
-                    <span className="text-gray-500">({stats.totalReviews} reviews)</span>
-                  </div>
-                )}
+              </div>
+              
+              <div className="mt-4 pt-4 border-t">
+                <p className="text-xs text-gray-500">
+                  Member since {user?.joinedDate || '2023-01-15'}
+                </p>
               </div>
             </CardContent>
           </Card>
 
           {/* Quick Stats */}
-          <Card>
+          <Card className="mt-6">
             <CardHeader>
-              <CardTitle className="text-lg">Performance Stats</CardTitle>
+              <CardTitle className="text-lg">Quick Stats</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <Calendar className="h-4 w-4 text-blue-600" />
-                  <span className="text-sm text-gray-600">Total Bookings</span>
-                </div>
-                <span className="font-semibold">{stats.totalBookings}</span>
+            <CardContent className="space-y-3">
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-gray-600">Profile Completion</span>
+                <span className="text-sm font-medium text-gray-900">85%</span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-2">
+                <div className="bg-blue-600 h-2 rounded-full" style={{ width: '85%' }}></div>
               </div>
               
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <DollarSign className="h-4 w-4 text-green-600" />
-                  <span className="text-sm text-gray-600">Total Revenue</span>
-                </div>
-                <span className="font-semibold">${stats.totalRevenue.toLocaleString()}</span>
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-gray-600">Response Rate</span>
+                <span className="text-sm font-medium text-green-600">98%</span>
               </div>
               
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <Users className="h-4 w-4 text-purple-600" />
-                  <span className="text-sm text-gray-600">Response Rate</span>
-                </div>
-                <span className="font-semibold">{stats.responseRate}%</span>
-              </div>
-              
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <Clock className="h-4 w-4 text-orange-600" />
-                  <span className="text-sm text-gray-600">Avg Response Time</span>
-                </div>
-                <span className="font-semibold">{stats.responseTime}</span>
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-gray-600">Active Services</span>
+                <span className="text-sm font-medium text-gray-900">12</span>
               </div>
             </CardContent>
           </Card>
         </div>
 
         {/* Profile Details */}
-        <div className="lg:col-span-2 space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Personal Information</CardTitle>
-              <CardDescription>Your basic contact and business information</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="name">Full Name</Label>
-                  {isEditing ? (
-                    <Input
-                      id="name"
-                      value={formData.name}
-                      onChange={(e) => setFormData({...formData, name: e.target.value})}
-                      placeholder="Enter your full name"
-                    />
-                  ) : (
-                    <div className="flex items-center mt-1">
-                      <User className="h-4 w-4 mr-2 text-gray-400" />
-                      <span>{user?.name || 'Not provided'}</span>
-                    </div>
-                  )}
-                </div>
-                
-                <div>
-                  <Label htmlFor="email">Email Address</Label>
-                  {isEditing ? (
-                    <Input
-                      id="email"
-                      type="email"
-                      value={formData.email}
-                      onChange={(e) => setFormData({...formData, email: e.target.value})}
-                      placeholder="Enter your email"
-                    />
-                  ) : (
-                    <div className="flex items-center mt-1">
-                      <Mail className="h-4 w-4 mr-2 text-gray-400" />
-                      <span>{user?.email || 'Not provided'}</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="phone">Phone Number</Label>
-                  {isEditing ? (
-                    <Input
-                      id="phone"
-                      value={formData.phone}
-                      onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                      placeholder="Enter your phone number"
-                    />
-                  ) : (
-                    <div className="flex items-center mt-1">
-                      <Phone className="h-4 w-4 mr-2 text-gray-400" />
-                      <span>{user?.phone || 'Not provided'}</span>
-                    </div>
-                  )}
-                </div>
-                
-                <div>
-                  <Label htmlFor="website">Website</Label>
-                  {isEditing ? (
-                    <Input
-                      id="website"
-                      value={formData.website}
-                      onChange={(e) => setFormData({...formData, website: e.target.value})}
-                      placeholder="https://your-website.com"
-                    />
-                  ) : (
-                    <div className="flex items-center mt-1">
-                      <Globe className="h-4 w-4 mr-2 text-gray-400" />
-                      <span>{user?.website || 'Not provided'}</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              <div>
-                <Label htmlFor="address">Business Address</Label>
-                {isEditing ? (
-                  <Textarea
-                    id="address"
-                    value={formData.address}
-                    onChange={(e) => setFormData({...formData, address: e.target.value})}
-                    placeholder="Enter your business address"
-                    rows={2}
-                  />
-                ) : (
-                  <div className="flex items-start mt-1">
-                    <MapPin className="h-4 w-4 mr-2 text-gray-400 mt-0.5" />
-                    <span>{user?.address || 'Not provided'}</span>
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-
+        <div className="lg:col-span-2">
           <Card>
             <CardHeader>
               <CardTitle>Business Information</CardTitle>
-              <CardDescription>Details about your business and services</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <Label htmlFor="businessName">Business Name</Label>
-                {isEditing ? (
-                  <Input
-                    id="businessName"
-                    value={formData.businessName}
-                    onChange={(e) => setFormData({...formData, businessName: e.target.value})}
-                    placeholder="Enter your business name"
-                  />
-                ) : (
-                  <div className="flex items-center mt-1">
-                    <Building className="h-4 w-4 mr-2 text-gray-400" />
-                    <span>{user?.businessName || 'Not provided'}</span>
+            <CardContent className="space-y-6">
+              {isEditing ? (
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="name">Full Name</Label>
+                      <Input
+                        id="name"
+                        name="name"
+                        value={formData.name}
+                        onChange={handleChange}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="email">Email Address</Label>
+                      <Input
+                        id="email"
+                        name="email"
+                        type="email"
+                        value={formData.email}
+                        onChange={handleChange}
+                      />
+                    </div>
                   </div>
-                )}
-              </div>
 
-              <div>
-                <Label htmlFor="description">Business Description</Label>
-                {isEditing ? (
-                  <Textarea
-                    id="description"
-                    value={formData.description}
-                    onChange={(e) => setFormData({...formData, description: e.target.value})}
-                    placeholder="Describe your business and services..."
-                    rows={4}
-                  />
-                ) : (
-                  <div className="mt-1">
-                    <p className="text-gray-700">
-                      {user?.description || 'No description provided. Add a description to help customers understand your services better.'}
-                    </p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="businessName">Business Name</Label>
+                      <Input
+                        id="businessName"
+                        name="businessName"
+                        value={formData.businessName}
+                        onChange={handleChange}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="phone">Phone Number</Label>
+                      <Input
+                        id="phone"
+                        name="phone"
+                        value={formData.phone}
+                        onChange={handleChange}
+                      />
+                    </div>
                   </div>
-                )}
-              </div>
 
-              <div>
-                <Label htmlFor="operatingHours">Operating Hours</Label>
-                {isEditing ? (
-                  <Input
-                    id="operatingHours"
-                    value={formData.operatingHours}
-                    onChange={(e) => setFormData({...formData, operatingHours: e.target.value})}
-                    placeholder="e.g., Mon-Fri: 9AM-6PM, Sat-Sun: 10AM-4PM"
-                  />
-                ) : (
-                  <div className="flex items-center mt-1">
-                    <Clock className="h-4 w-4 mr-2 text-gray-400" />
-                    <span>{user?.operatingHours || 'Not provided'}</span>
+                  <div>
+                    <Label htmlFor="address">Business Address</Label>
+                    <Textarea
+                      id="address"
+                      name="address"
+                      value={formData.address}
+                      onChange={handleChange}
+                      rows={3}
+                    />
                   </div>
-                )}
-              </div>
 
-              <div>
-                <Label>Service Type</Label>
-                <div className="mt-1">
-                  <Badge variant="outline" className="capitalize">
-                    {getServiceTypeLabel(user?.serviceType)}
-                  </Badge>
+                  <div>
+                    <Label htmlFor="bio">Professional Bio</Label>
+                    <Textarea
+                      id="bio"
+                      name="bio"
+                      value={formData.bio}
+                      onChange={handleChange}
+                      rows={4}
+                      placeholder="Tell potential customers about your experience and what makes your services special..."
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="website">Website</Label>
+                      <Input
+                        id="website"
+                        name="website"
+                        value={formData.website}
+                        onChange={handleChange}
+                        placeholder="https://your-website.com"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="experience">Years of Experience</Label>
+                      <Input
+                        id="experience"
+                        name="experience"
+                        value={formData.experience}
+                        onChange={handleChange}
+                        placeholder="e.g., 5+ years"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="languages">Languages Spoken</Label>
+                    <Input
+                      id="languages"
+                      name="languages"
+                      value={formData.languages}
+                      onChange={handleChange}
+                      placeholder="e.g., English, Spanish, French"
+                    />
+                  </div>
                 </div>
-                <p className="text-xs text-gray-500 mt-1">
-                  Contact support to change your service type
-                </p>
-              </div>
+              ) : (
+                <div className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <h3 className="text-sm font-medium text-gray-500 mb-1">Full Name</h3>
+                      <p className="text-gray-900">{user?.name}</p>
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-medium text-gray-500 mb-1">Email Address</h3>
+                      <p className="text-gray-900">{user?.email}</p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <h3 className="text-sm font-medium text-gray-500 mb-1">Business Name</h3>
+                      <p className="text-gray-900">{user?.businessName}</p>
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-medium text-gray-500 mb-1">Phone Number</h3>
+                      <p className="text-gray-900">{user?.phone}</p>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-500 mb-1">Business Address</h3>
+                    <p className="text-gray-900">{user?.address}</p>
+                  </div>
+
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-500 mb-1">Professional Bio</h3>
+                    <p className="text-gray-900">{formData.bio}</p>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <h3 className="text-sm font-medium text-gray-500 mb-1">Website</h3>
+                      <p className="text-gray-900">{formData.website || 'Not provided'}</p>
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-medium text-gray-500 mb-1">Experience</h3>
+                      <p className="text-gray-900">{formData.experience}</p>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-500 mb-1">Languages Spoken</h3>
+                    <p className="text-gray-900">{formData.languages}</p>
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
 
           {/* Verification Status */}
-          <Card>
+          <Card className="mt-6">
             <CardHeader>
-              <CardTitle>Account Verification</CardTitle>
-              <CardDescription>Verification status and requirements</CardDescription>
+              <CardTitle>Verification Status</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
-                  <div>
-                    <p className="font-medium text-green-900">Email Verified</p>
-                    <p className="text-sm text-green-700">Your email is verified</p>
+            <CardContent>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <span className="text-green-500">✅</span>
+                    <span className="text-gray-900">Email Verified</span>
                   </div>
-                  <Badge className="bg-green-600">Verified</Badge>
+                  <span className="text-sm text-green-600">Verified</span>
                 </div>
                 
-                <div className="flex items-center justify-between p-3 bg-yellow-50 rounded-lg">
-                  <div>
-                    <p className="font-medium text-yellow-900">Phone Verification</p>
-                    <p className="text-sm text-yellow-700">Verify your phone number</p>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <span className="text-green-500">✅</span>
+                    <span className="text-gray-900">Phone Verified</span>
                   </div>
-                  <Badge variant="outline">Pending</Badge>
+                  <span className="text-sm text-green-600">Verified</span>
                 </div>
                 
-                <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
-                  <div>
-                    <p className="font-medium text-blue-900">Business License</p>
-                    <p className="text-sm text-blue-700">Upload business documents</p>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <span className="text-yellow-500">⏳</span>
+                    <span className="text-gray-900">Business License</span>
                   </div>
-                  <Badge variant="outline">Optional</Badge>
+                  <Button size="sm" variant="outline">Upload</Button>
                 </div>
                 
-                <div className="flex items-center justify-between p-3 bg-purple-50 rounded-lg">
-                  <div>
-                    <p className="font-medium text-purple-900">Profile Complete</p>
-                    <p className="text-sm text-purple-700">85% completed</p>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <span className="text-yellow-500">⏳</span>
+                    <span className="text-gray-900">Insurance Certificate</span>
                   </div>
-                  <Badge className="bg-purple-600">85%</Badge>
+                  <Button size="sm" variant="outline">Upload</Button>
                 </div>
               </div>
             </CardContent>
