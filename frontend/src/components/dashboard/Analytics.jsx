@@ -1,339 +1,152 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
-import { Button } from '../ui/button';
-import { Badge } from '../ui/badge';
-import { 
-  TrendingUp, 
-  TrendingDown, 
-  DollarSign, 
-  Users, 
-  Calendar, 
-  Star,
-  Eye,
-  MousePointer,
-  Percent,
-  Download
-} from 'lucide-react';
-import { mockAnalytics, mockBookings, mockPayments } from '../../utils/mockData';
+import { mockStats } from '../../utils/mockData';
 
 const Analytics = () => {
-  const [timeRange, setTimeRange] = useState('month');
-
-  // Mock analytics data based on time range
-  const getAnalyticsData = () => {
-    const baseData = {
-      revenue: {
-        current: timeRange === 'week' ? 850 : timeRange === 'month' ? 3240 : 15420,
-        previous: timeRange === 'week' ? 720 : timeRange === 'month' ? 2980 : 13450,
-        change: timeRange === 'week' ? 18.1 : timeRange === 'month' ? 8.7 : 14.6
-      },
-      bookings: {
-        current: timeRange === 'week' ? 4 : timeRange === 'month' ? 15 : 89,
-        previous: timeRange === 'week' ? 3 : timeRange === 'month' ? 12 : 76,
-        change: timeRange === 'week' ? 33.3 : timeRange === 'month' ? 25.0 : 17.1
-      },
-      conversion: {
-        current: timeRange === 'week' ? 14.2 : timeRange === 'month' ? 12.5 : 11.8,
-        previous: timeRange === 'week' ? 12.8 : timeRange === 'month' ? 11.2 : 10.5,
-        change: timeRange === 'week' ? 10.9 : timeRange === 'month' ? 11.6 : 12.4
-      },
-      views: timeRange === 'week' ? 1240 : timeRange === 'month' ? 5680 : 34200,
-      clicks: timeRange === 'week' ? 176 : timeRange === 'month' ? 710 : 4035
-    };
-    return baseData;
-  };
-
-  const analytics = getAnalyticsData();
-
-  const MetricCard = ({ title, value, change, changeType, icon: Icon, description, prefix = '', suffix = '' }) => (
-    <Card className="hover-scale transition-all duration-200">
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium text-gray-600">{title}</CardTitle>
-        <Icon className="h-5 w-5 text-blue-600" />
-      </CardHeader>
-      <CardContent>
-        <div className="text-3xl font-bold text-gray-900 mb-2">
-          {prefix}{typeof value === 'number' ? value.toLocaleString() : value}{suffix}
-        </div>
-        <div className="flex items-center text-sm">
-          {changeType === 'positive' ? (
-            <TrendingUp className="h-4 w-4 text-green-600 mr-1" />
-          ) : changeType === 'negative' ? (
-            <TrendingDown className="h-4 w-4 text-red-600 mr-1" />
-          ) : null}
-          <span className={`font-medium ${
-            changeType === 'positive' ? 'text-green-600' : 
-            changeType === 'negative' ? 'text-red-600' : 'text-gray-500'
-          }`}>
-            {changeType !== 'neutral' && (changeType === 'positive' ? '+' : '')}{change}%
-          </span>
-          <span className="text-gray-500 ml-1">vs last {timeRange}</span>
-        </div>
-        <p className="text-xs text-gray-500 mt-1">{description}</p>
-      </CardContent>
-    </Card>
-  );
+  const monthlyData = [
+    { month: 'Jan', bookings: 23, revenue: 4500 },
+    { month: 'Feb', bookings: 31, revenue: 6200 },
+    { month: 'Mar', bookings: 45, revenue: 8900 },
+    { month: 'Apr', bookings: 52, revenue: 10400 },
+    { month: 'May', bookings: 38, revenue: 7600 },
+    { month: 'Jun', bookings: 41, revenue: 8200 },
+  ];
 
   return (
-    <div className="space-y-8 animate-fade-in">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Analytics</h1>
-          <p className="text-gray-600">Track your business performance and growth</p>
-        </div>
-        <div className="flex items-center space-x-4">
-          <Select value={timeRange} onValueChange={setTimeRange}>
-            <SelectTrigger className="w-32">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="week">This Week</SelectItem>
-              <SelectItem value="month">This Month</SelectItem>
-              <SelectItem value="year">This Year</SelectItem>
-            </SelectContent>
-          </Select>
-          <Button variant="outline" size="sm">
-            <Download className="h-4 w-4 mr-2" />
-            Export
-          </Button>
-        </div>
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-3xl font-bold text-gray-900">Analytics Dashboard</h1>
+        <p className="text-gray-600 mt-2">Track your business performance and growth</p>
       </div>
 
       {/* Key Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <MetricCard
-          title="Revenue"
-          value={analytics.revenue.current}
-          change={analytics.revenue.change}
-          changeType="positive"
-          icon={DollarSign}
-          description={`Total earnings this ${timeRange}`}
-          prefix="$"
-        />
-        <MetricCard
-          title="Bookings"
-          value={analytics.bookings.current}
-          change={analytics.bookings.change}
-          changeType="positive"
-          icon={Calendar}
-          description={`New bookings this ${timeRange}`}
-        />
-        <MetricCard
-          title="Conversion Rate"
-          value={analytics.conversion.current}
-          change={analytics.conversion.change}
-          changeType="positive"
-          icon={Percent}
-          description="Views to bookings ratio"
-          suffix="%"
-        />
-        <MetricCard
-          title="Average Rating"
-          value={mockAnalytics.avgRating}
-          change="neutral"
-          changeType="neutral"
-          icon={Star}
-          description={`Based on ${mockAnalytics.totalReviews} reviews`}
-        />
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-gray-600">Total Revenue</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-gray-900">${mockStats.totalRevenue.toLocaleString()}</div>
+            <p className="text-xs text-green-600 flex items-center mt-1">
+              <span className="mr-1">↗</span>
+              +12% from last month
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-gray-600">Bookings</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-gray-900">{mockStats.totalBookings}</div>
+            <p className="text-xs text-green-600 flex items-center mt-1">
+              <span className="mr-1">↗</span>
+              +8% from last month
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-gray-600">Average Rating</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-gray-900">{mockStats.averageRating}</div>
+            <p className="text-xs text-green-600 flex items-center mt-1">
+              <span className="mr-1">↗</span>
+              +0.2 from last month
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-gray-600">Completion Rate</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-gray-900">94%</div>
+            <p className="text-xs text-green-600 flex items-center mt-1">
+              <span className="mr-1">↗</span>
+              +3% from last month
+            </p>
+          </CardContent>
+        </Card>
       </div>
 
-      <Tabs defaultValue="performance" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="performance">Performance</TabsTrigger>
-          <TabsTrigger value="revenue">Revenue</TabsTrigger>
-          <TabsTrigger value="bookings">Bookings</TabsTrigger>
-          <TabsTrigger value="engagement">Engagement</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="performance" className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Performance Overview */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Performance Overview</CardTitle>
-                <CardDescription>Key performance indicators for this {timeRange}</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
-                      <Eye className="h-4 w-4 text-blue-600" />
-                      <span className="text-sm font-medium">Profile Views</span>
-                    </div>
-                    <span className="text-lg font-bold">{analytics.views.toLocaleString()}</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
-                      <MousePointer className="h-4 w-4 text-green-600" />
-                      <span className="text-sm font-medium">Service Clicks</span>
-                    </div>
-                    <span className="text-lg font-bold">{analytics.clicks.toLocaleString()}</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
-                      <Calendar className="h-4 w-4 text-purple-600" />
-                      <span className="text-sm font-medium">Bookings</span>
-                    </div>
-                    <span className="text-lg font-bold">{analytics.bookings.current}</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-2">
-                      <Percent className="h-4 w-4 text-orange-600" />
-                      <span className="text-sm font-medium">Conversion Rate</span>
-                    </div>
-                    <span className="text-lg font-bold">{analytics.conversion.current}%</span>
-                  </div>
+      {/* Charts */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Revenue Chart */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Revenue Trend</CardTitle>
+            <CardDescription>Monthly revenue over the last 6 months</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="h-80 flex items-end justify-between space-x-2">
+              {monthlyData.map((data, index) => (
+                <div key={index} className="flex flex-col items-center flex-1">
+                  <div 
+                    className="w-full bg-blue-500 rounded-t-sm mb-2 min-h-4"
+                    style={{ height: `${(data.revenue / 12000) * 200}px` }}
+                  ></div>
+                  <span className="text-xs text-gray-600">{data.month}</span>
+                  <span className="text-xs text-gray-800 font-medium">${data.revenue}</span>
                 </div>
-              </CardContent>
-            </Card>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
 
-            {/* Top Services */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Top Performing Services</CardTitle>
-                <CardDescription>Your most successful offerings</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {mockAnalytics.topServices.map((service, index) => (
-                    <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                      <div className="flex-1">
-                        <h4 className="font-medium text-gray-900">{service.name}</h4>
-                        <p className="text-sm text-gray-600">{service.bookings} bookings</p>
-                      </div>
-                      <div className="text-right">
-                        <p className="font-semibold text-green-600">${service.revenue.toLocaleString()}</p>
-                        <Badge variant="secondary" className="text-xs">
-                          #{index + 1}
-                        </Badge>
-                      </div>
-                    </div>
-                  ))}
+        {/* Bookings Chart */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Booking Trend</CardTitle>
+            <CardDescription>Number of bookings over the last 6 months</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="h-80 flex items-end justify-between space-x-2">
+              {monthlyData.map((data, index) => (
+                <div key={index} className="flex flex-col items-center flex-1">
+                  <div 
+                    className="w-full bg-green-500 rounded-t-sm mb-2 min-h-4"
+                    style={{ height: `${(data.bookings / 60) * 200}px` }}
+                  ></div>
+                  <span className="text-xs text-gray-600">{data.month}</span>
+                  <span className="text-xs text-gray-800 font-medium">{data.bookings}</span>
                 </div>
-              </CardContent>
-            </Card>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Performance Insights */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Performance Insights</CardTitle>
+          <CardDescription>Key insights about your business performance</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="text-center p-4 bg-blue-50 rounded-lg">
+              <div className="text-2xl mb-2">🏆</div>
+              <h3 className="font-semibold text-gray-900 mb-1">Top Performer</h3>
+              <p className="text-sm text-gray-600">Your Ocean View Suite is your most popular service</p>
+            </div>
+            <div className="text-center p-4 bg-green-50 rounded-lg">
+              <div className="text-2xl mb-2">📈</div>
+              <h3 className="font-semibold text-gray-900 mb-1">Growth Trend</h3>
+              <p className="text-sm text-gray-600">Bookings have increased by 25% this quarter</p>
+            </div>
+            <div className="text-center p-4 bg-purple-50 rounded-lg">
+              <div className="text-2xl mb-2">⭐</div>
+              <h3 className="font-semibold text-gray-900 mb-1">Customer Satisfaction</h3>
+              <p className="text-sm text-gray-600">95% of customers rate you 4+ stars</p>
+            </div>
           </div>
-        </TabsContent>
-
-        <TabsContent value="revenue" className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <Card className="lg:col-span-2">
-              <CardHeader>
-                <CardTitle>Revenue Breakdown</CardTitle>
-                <CardDescription>Detailed revenue analysis</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="h-64 flex items-center justify-center text-gray-500">
-                  <div className="text-center">
-                    <TrendingUp className="h-12 w-12 mx-auto mb-4 text-blue-600" />
-                    <p>Revenue chart visualization would go here</p>
-                    <p className="text-sm">Integration with charting library needed</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Payment Methods</CardTitle>
-                <CardDescription>Revenue by payment type</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm">Credit Card</span>
-                  <span className="font-semibold">68%</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm">PayPal</span>
-                  <span className="font-semibold">22%</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm">Bank Transfer</span>
-                  <span className="font-semibold">10%</span>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="bookings" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Booking Trends</CardTitle>
-              <CardDescription>Analysis of booking patterns and trends</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="h-64 flex items-center justify-center text-gray-500">
-                <div className="text-center">
-                  <Calendar className="h-12 w-12 mx-auto mb-4 text-blue-600" />
-                  <p>Booking trends chart would go here</p>
-                  <p className="text-sm">Shows booking patterns over time</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="engagement" className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Customer Engagement</CardTitle>
-                <CardDescription>How customers interact with your services</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
-                  <div>
-                    <p className="font-medium">Average Response Time</p>
-                    <p className="text-sm text-gray-600">Time to respond to messages</p>
-                  </div>
-                  <Badge className="bg-blue-600">2.3 hours</Badge>
-                </div>
-                <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
-                  <div>
-                    <p className="font-medium">Customer Satisfaction</p>
-                    <p className="text-sm text-gray-600">Based on reviews and ratings</p>
-                  </div>
-                  <Badge className="bg-green-600">92%</Badge>
-                </div>
-                <div className="flex items-center justify-between p-3 bg-purple-50 rounded-lg">
-                  <div>
-                    <p className="font-medium">Repeat Customers</p>
-                    <p className="text-sm text-gray-600">Customers who booked again</p>
-                  </div>
-                  <Badge className="bg-purple-600">34%</Badge>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Review Summary</CardTitle>
-                <CardDescription>Customer feedback overview</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {[5, 4, 3, 2, 1].map((rating) => (
-                  <div key={rating} className="flex items-center space-x-3">
-                    <span className="text-sm w-8">{rating} ★</span>
-                    <div className="flex-1 bg-gray-200 rounded-full h-2">
-                      <div 
-                        className="bg-blue-600 h-2 rounded-full" 
-                        style={{ width: `${rating === 5 ? 60 : rating === 4 ? 25 : rating === 3 ? 10 : rating === 2 ? 3 : 2}%` }}
-                      ></div>
-                    </div>
-                    <span className="text-sm text-gray-600 w-8">
-                      {rating === 5 ? 60 : rating === 4 ? 25 : rating === 3 ? 10 : rating === 2 ? 3 : 2}%
-                    </span>
-                  </div>
-                ))}
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
-      </Tabs>
+        </CardContent>
+      </Card>
     </div>
   );
 };
