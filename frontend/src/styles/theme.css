@@ -1,67 +1,61 @@
-/* JourneyQ Theme Colors */
+/* Theme CSS for JourneyQ Application */
+
 :root {
-  /* Primary colors - converted from Flutter theme */
-  --primary-blue: #0088cc;
-  --light-blue-bg: #F8FAFC;
-  
-  /* Gradient colors */
-  --gradient-dark-blue: #1E3A8A;
-  --gradient-medium-blue: #3B82F6;
-  --gradient-cyan: #06B6D4;
-  
-  /* Extended palette */
-  --primary-50: #E6F3FA;
-  --primary-100: #CCE7F5;
-  --primary-200: #99CFEB;
-  --primary-300: #66B7E1;
-  --primary-400: #339FD7;
-  --primary-500: #0088cc;
-  --primary-600: #006DA3;
-  --primary-700: #00527A;
-  --primary-800: #003752;
-  --primary-900: #001C29;
-  
-  /* Secondary colors */
-  --secondary-blue: #33a3dd;
-  
-  /* Status colors */
-  --success: #10B981;
-  --warning: #F59E0B;
-  --error: #EF4444;
-  --info: var(--primary-blue);
+  --background: 0 0% 100%;
+  --foreground: 222.2 84% 4.9%;
+  --card: 0 0% 100%;
+  --card-foreground: 222.2 84% 4.9%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 222.2 84% 4.9%;
+  --primary: 221.2 83.2% 53.3%;
+  --primary-foreground: 210 40% 98%;
+  --secondary: 210 40% 96%;
+  --secondary-foreground: 222.2 84% 4.9%;
+  --muted: 210 40% 96%;
+  --muted-foreground: 215.4 16.3% 46.9%;
+  --accent: 210 40% 96%;
+  --accent-foreground: 222.2 84% 4.9%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 210 40% 98%;
+  --border: 214.3 31.8% 91.4%;
+  --input: 214.3 31.8% 91.4%;
+  --ring: 221.2 83.2% 53.3%;
+  --radius: 0.5rem;
 }
 
-/* Custom gradients */
-.gradient-journeyq {
-  background: linear-gradient(135deg, var(--gradient-dark-blue) 0%, var(--gradient-medium-blue) 50%, var(--gradient-cyan) 100%);
+.dark {
+  --background: 222.2 84% 4.9%;
+  --foreground: 210 40% 98%;
+  --card: 222.2 84% 4.9%;
+  --card-foreground: 210 40% 98%;
+  --popover: 222.2 84% 4.9%;
+  --popover-foreground: 210 40% 98%;
+  --primary: 217.2 91.2% 59.8%;
+  --primary-foreground: 222.2 84% 4.9%;
+  --secondary: 217.2 32.6% 17.5%;
+  --secondary-foreground: 210 40% 98%;
+  --muted: 217.2 32.6% 17.5%;
+  --muted-foreground: 215 20.2% 65.1%;
+  --accent: 217.2 32.6% 17.5%;
+  --accent-foreground: 210 40% 98%;
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 210 40% 98%;
+  --border: 217.2 32.6% 17.5%;
+  --input: 217.2 32.6% 17.5%;
+  --ring: 224.3 76.3% 94.1%;
 }
 
-.gradient-journeyq-subtle {
-  background: linear-gradient(135deg, var(--primary-100) 0%, var(--primary-50) 100%);
+* {
+  border-color: hsl(var(--border));
 }
 
-/* Glass morphism effect */
-.glass-morphism {
-  background: rgba(255, 255, 255, 0.25);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.18);
+body {
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
 }
 
-/* Animation utilities */
-.animate-fade-in {
-  animation: fadeIn 0.3s ease-in-out;
-}
-
-.animate-slide-up {
-  animation: slideUp 0.4s ease-out;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes slideUp {
+/* Custom animations */
+@keyframes slide-up {
   from {
     opacity: 0;
     transform: translateY(20px);
@@ -72,19 +66,24 @@
   }
 }
 
-/* Hover effects */
-.hover-scale {
-  transition: transform 0.2s ease-in-out;
+.animate-slide-up {
+  animation: slide-up 0.5s ease-out;
 }
 
-.hover-scale:hover {
-  transform: scale(1.02);
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
 }
 
-.hover-glow {
-  transition: box-shadow 0.2s ease-in-out;
+::-webkit-scrollbar-track {
+  background: hsl(var(--muted));
 }
 
-.hover-glow:hover {
-  box-shadow: 0 0 20px rgba(0, 136, 204, 0.3);
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground));
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--accent-foreground));
 }
