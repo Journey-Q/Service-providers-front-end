@@ -14,6 +14,10 @@ import Payments from "./components/dashboard/Payments";
 import Messages from "./components/dashboard/Messages";
 import Advertisements from "./components/dashboard/Advertisements";
 import HotelRooms from "./components/services/HotelRooms";
+import TourPackages from "./components/services/TourPackages";
+import PastTours from "./components/services/PastTours";
+import Vehicles from "./components/services/Vehicles";
+import GeneralServices from "./components/services/GeneralServices";
 import "./styles/theme.css";
 
 function App() {
@@ -39,10 +43,10 @@ function App() {
               <Route path="messages" element={<Messages />} />
               <Route path="ads" element={<Advertisements />} />
               <Route path="rooms" element={<HotelRooms />} />
-              <Route path="tours" element={<div className="p-8 text-center text-gray-500">Tour Packages component coming soon...</div>} />
-              <Route path="past-tours" element={<div className="p-8 text-center text-gray-500">Past Tours component coming soon...</div>} />
-              <Route path="vehicles" element={<div className="p-8 text-center text-gray-500">Vehicles component coming soon...</div>} />
-              <Route path="services" element={<div className="p-8 text-center text-gray-500">Services component coming soon...</div>} />
+              <Route path="tours" element={<TourPackages />} />
+              <Route path="past-tours" element={<PastTours />} />
+              <Route path="vehicles" element={<Vehicles />} />
+              <Route path="services" element={<GeneralServices />} />
               <Route path="profile" element={<div className="p-8 text-center text-gray-500">Profile component coming soon...</div>} />
               <Route path="settings" element={<div className="p-8 text-center text-gray-500">Settings component coming soon...</div>} />
             </Route>
